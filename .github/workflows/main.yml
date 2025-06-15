@@ -1,0 +1,27 @@
+name: Deploy WAR File to Remote Server
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download WAR file from GitHub Release
+      uses: dsaltares/fetch-gh-release-asset@v1
+      with:
+        repo: ${{ github.repository }}
+        version: "latest"
+        file: yourapp.war
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload WAR to Remote Server via SCP
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASS }}
+        source: "yourapp.war"
+        target: "/opt/tomcat/webapps/"
